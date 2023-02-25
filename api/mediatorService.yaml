@@ -1,1 +1,67 @@
+openapi: 3.0.3
+info:
+  title: Mediator Service
+  version: 1.0.11
+servers:
+  - url: http://localhost:9765
 
+paths:
+  /get-patient-data:
+    post:
+      tags:
+        - getData
+      summary: Doctor request patient data
+      description: Doctor will send a request to get patient data . This is done after consent is given.Mediator service will validate this request using cms.
+      operationId: getPatientData
+      requestBody:
+        description: ABHA ID of the patient will be given. 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/getPatientData'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patientData'
+        '404':
+          description: Credentials not found
+
+
+
+components:
+  schemas:
+    getPatientData:
+      type: object
+      properties:
+        ABHA_ID:
+          type: string
+          format: string
+          example: "201822222"
+        Doctor_ID:
+          type: string
+          format: string
+          example: "h1_d1"
+        Consent_artifact_ID:
+          type: string
+          format: string
+          example: "143"
+        QueryParams:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/params'
+    params:
+      type: object
+    
+    patientData:
+      type: object
+      properties:
+        data:
+          type: object
+          format: healthRecords
+          example:
+            'blood group' : "b+"
