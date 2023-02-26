@@ -28,7 +28,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/patientData'
         '404':
-          description: Credentials not found
+          description: ID not available
+  /send-patient-data:
+    post:
+      tags:
+        - sendData
+      summary: CMS asks Mediator service to send data from destination hospital to source
+      description: After approval from patient, CMS will request the Mediator to get data from the destination hospital and send it back to the doctor
+      operationId: sendPatientData
+      requestBody:
+        description: ABHA ID of the patient will be given. 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sendPatientData'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patientData'
+        '404':
+          description: Data not available
 
 
 
@@ -58,10 +81,51 @@ components:
       type: object
     
     patientData:
+      type: array
+      items:
+        properties:
+          data:
+            type: object
+            format: healthRecords
+            example:
+              'blood group' : "b+"
+    sendPatientData:
       type: object
       properties:
-        data:
-          type: object
-          format: healthRecords
-          example:
-            'blood group' : "b+"
+        ABHA_ID:
+          type: string
+          format: string
+          example: "201822222"
+        Doctor_ID:
+          type: string
+          format: string
+          example: "h1_d1"
+        consent:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+                format: string
+                example: "blood report"
+              from:
+                type: string
+                format: date
+                example: '2022-07-01'
+              to:
+                type: string
+                format: date
+                example: '2022-07-01'
+              hospital:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: string
+                    example: "h1"
+                  name:
+                    type: string
+                    format: string
+                    example: "hospital 1"
+          minItems: 2
