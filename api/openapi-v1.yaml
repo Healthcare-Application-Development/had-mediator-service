@@ -10,8 +10,8 @@ paths:
     post:
       tags:
         - getData
-      summary: Doctor request patient data
-      description: Doctor will send a request to get patient data . This is done after consent is given.Mediator service will validate this request using cms.
+      summary: Patient is requesting for their health records data
+      description: Patient will request to see his/her health records.
       operationId: getPatientData
       requestBody:
         description: ABHA ID of the patient will be given. 
