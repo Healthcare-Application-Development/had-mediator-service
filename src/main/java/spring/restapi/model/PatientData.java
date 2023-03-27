@@ -1,11 +1,8 @@
 package spring.restapi.model;
 
-
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-
-//import javax.persistence.*;
 
 @Entity
 @Table(name = "patient_data")
@@ -26,7 +23,6 @@ public class PatientData {
         this.abha_id = abha_id;
     }
 
-
     public String getRecordType() {
         return record_type;
     }
@@ -41,7 +37,5 @@ public class PatientData {
     public void setDetails(String details) {
         this.details = details;
     }
-
-
 
 }

@@ -6,8 +6,8 @@ servers:
   - url: http://localhost:9765
 
 paths:
-  /get-patient-data:
-    post:
+  /get-patient-data/{id}:
+    get:
       tags:
         - getData
       summary: Patient is requesting for their health records data
