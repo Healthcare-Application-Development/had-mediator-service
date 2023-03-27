@@ -11,7 +11,6 @@ import java.util.Date;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    //
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request)  {

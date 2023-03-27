@@ -2,13 +2,8 @@ package spring.restapi.exception;
 
 import java.util.Date;
 
-/**
- * @Created 31 / 03 / 2020 - 3:52 PM
- * @project SpringRestAPI
- * @Author Hamdamboy
- */
 public class ErrorDetails {
-    //
+
     private Date timestamp;
     private String message;
     private String details;
