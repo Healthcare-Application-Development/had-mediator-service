@@ -29,6 +29,7 @@ paths:
                 $ref: '#/components/schemas/patientData'
         '404':
           description: ID not available
+
   /send-patient-data:
     post:
       tags:
