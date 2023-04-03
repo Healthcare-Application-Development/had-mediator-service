@@ -1,4 +1,4 @@
-package spring.restapi.exception;
+package com.example.hadmediatorservice.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

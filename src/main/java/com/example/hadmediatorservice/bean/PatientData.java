@@ -1,4 +1,4 @@
-package spring.restapi.model;
+package com.example.hadmediatorservice.bean;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 

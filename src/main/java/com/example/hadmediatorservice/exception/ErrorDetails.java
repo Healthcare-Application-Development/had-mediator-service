@@ -1,4 +1,4 @@
-package spring.restapi.exception;
+package com.example.hadmediatorservice.exception;
 
 import java.util.Date;
 
