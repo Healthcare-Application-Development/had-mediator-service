@@ -1,0 +1,86 @@
+package com.example.hadmediatorservice.controller;
+
+import com.example.hadmediatorservice.bean.*;
+import com.example.hadmediatorservice.exception.ResourceNotFoundException;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import java.util.*;
+
+@RestController
+@RequestMapping("/patientHealthRecord")
+public class PatientHealthRecordController {
+
+    public PatientHealthRecordController() {}
+
+    @PostMapping("/getPatientHealthRecord")
+    public ResponseEntity<List<PatientHealthRecord>> getPatientHealthRecord(@RequestBody ConsentArtifact consentArtifact) {
+        //Fetching the connectionURLs from the DB
+        RestTemplate restTemplate = new RestTemplate();
+        String listOfConnectionURL = "http://localhost:8080/connectionURLData/getAllConnectionURL";
+        ResponseEntity<List<String>> requestEntityURLs = restTemplate.exchange(listOfConnectionURL, HttpMethod.GET, null, new ParameterizedTypeReference<List<String>>() {});
+        List<String> listOfConnectionURLs = requestEntityURLs.getBody();
+        List<PatientHealthRecord> filteredList = new ArrayList<>();
+        for (int i = 0; i < listOfConnectionURLs.size(); i++) {
+            String connectionURL = listOfConnectionURLs.get(i);
+            List<ConsentItem> listOfConsentItem = consentArtifact.getConsentItems();
+
+                //for each connectionURL fetching List of PatientHealthRecord
+                for (int j = 0; j < listOfConsentItem.size(); j++) {
+                    ConsentItem consentItem = listOfConsentItem.get(j);
+
+                    //create a map with the correct parameter names and values
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("abhaId", consentItem.getPatientID());
+                    params.put("recordType", consentItem.getConsentMessage());
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(params, headers);
+                    ResponseEntity<List<PatientHealthRecord>> responseEntity = restTemplate.exchange(connectionURL, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<PatientHealthRecord>>() {
+                    });
+                    List<PatientHealthRecord> records = responseEntity.getBody();
+                    System.out.println(records);
+
+                    // filter the records based on the fromDate and toDate fields
+                    for (int k = 0; k < records.size(); k++) {
+                        PatientHealthRecord patientHealthRecord = records.get(k);
+                        System.out.println(patientHealthRecord.getHospitalName());
+                        if (patientHealthRecord != null && consentItem.getFromDate() != null && consentItem.getToDate() != null) {
+                            Date recordDate = patientHealthRecord.getTimestamp();
+                            Date fromDate = consentItem.getFromDate();
+                            Date toDate = consentItem.getToDate();
+                            System.out.println(recordDate + "" + fromDate);
+                            System.out.println(recordDate + "" + toDate);
+                            if (recordDate.after(fromDate) && recordDate.before(toDate)) {
+                                filteredList.add(patientHealthRecord);
+                            }
+                        }
+                    }
+                    System.out.println(filteredList);
+                }
+            }
+            return new ResponseEntity<List<PatientHealthRecord>>(filteredList, HttpStatus.OK);
+        }
+
+
+
+    @GetMapping("/getAllPatientHealthRecord")
+    public Response getAllPatientHealthRecord() throws ResourceNotFoundException{
+        ArrayList<String> portNumbers = new ArrayList<String>();
+        portNumbers.add("http://localhost:3002/api/receptionist/getAll");
+        portNumbers.add("http://localhost:3000/api/receptionist/getAll");
+        List<Response> responseList=new ArrayList<>();
+        for(int i = 0; i < portNumbers.size(); i++) {
+            RestTemplate restTemplate = new RestTemplate();
+            String fooResourceUrl = portNumbers.get(i);
+            ResponseEntity<Response> response= restTemplate.getForEntity(fooResourceUrl, Response.class);
+            responseList.add(response.getBody());
+        }
+        return new Response(responseList, 200);
+    }
+
+
+
+
+}
