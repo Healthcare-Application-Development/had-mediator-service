@@ -5,10 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 //@EnableJpaAuditing
-public class HadMediatorApplication {
+public class HadMediatorServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(HadMediatorApplication.class, args);
+        SpringApplication.run(HadMediatorServiceApplication.class, args);
     }
 
 }
