@@ -2,6 +2,8 @@ package com.example.hadmediatorservice.controller;
 
 import com.example.hadmediatorservice.bean.*;
 import com.example.hadmediatorservice.exception.ResourceNotFoundException;
+import com.example.hadmediatorservice.interfaces.ConnectionURLInterface;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +16,16 @@ public class PatientHealthRecordController {
 
     public PatientHealthRecordController() {}
 
+
+    @Autowired
+    private ConnectionURLInterface connectionURLInterface;
+
+
     @PostMapping("/getPatientHealthRecord")
     public ResponseEntity<List<PatientHealthRecord>> getPatientHealthRecord(@RequestBody ConsentArtifact consentArtifact) {
         //Fetching the connectionURLs from the DB
         RestTemplate restTemplate = new RestTemplate();
-        String listOfConnectionURL = "http://localhost:8080/connectionURLData/getAllConnectionURL";
-        ResponseEntity<List<String>> requestEntityURLs = restTemplate.exchange(listOfConnectionURL, HttpMethod.GET, null, new ParameterizedTypeReference<List<String>>() {});
+        ResponseEntity<List<String>> requestEntityURLs= connectionURLInterface.getAllConnectionURL();
         List<String> listOfConnectionURLs = requestEntityURLs.getBody();
         List<PatientHealthRecord> filteredList = new ArrayList<>();
         for (int i = 0; i < listOfConnectionURLs.size(); i++) {
