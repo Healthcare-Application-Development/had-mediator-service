@@ -29,7 +29,8 @@ public class PatientHealthRecordController {
         List<String> listOfConnectionURLs = requestEntityURLs.getBody();
         List<PatientHealthRecord> filteredList = new ArrayList<>();
         for (int i = 0; i < listOfConnectionURLs.size(); i++) {
-            String connectionURL = listOfConnectionURLs.get(i);
+            String connectionURLTemp = listOfConnectionURLs.get(i);
+            String connectionURL=connectionURLTemp+"/patientHealthRecord/getPatientHealthRecord/";
             List<ConsentItem> listOfConsentItem = consentArtifact.getConsentItems();
 
                 //for each connectionURL fetching List of PatientHealthRecord
@@ -46,30 +47,52 @@ public class PatientHealthRecordController {
                     ResponseEntity<List<PatientHealthRecord>> responseEntity = restTemplate.exchange(connectionURL, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<PatientHealthRecord>>() {
                     });
                     List<PatientHealthRecord> records = responseEntity.getBody();
-                    System.out.println(records);
 
                     // filter the records based on the fromDate and toDate fields
                     for (int k = 0; k < records.size(); k++) {
                         PatientHealthRecord patientHealthRecord = records.get(k);
-                        System.out.println(patientHealthRecord.getHospitalName());
                         if (patientHealthRecord != null && consentItem.getFromDate() != null && consentItem.getToDate() != null) {
                             Date recordDate = patientHealthRecord.getTimestamp();
                             Date fromDate = consentItem.getFromDate();
                             Date toDate = consentItem.getToDate();
-                            System.out.println(recordDate + "" + fromDate);
-                            System.out.println(recordDate + "" + toDate);
                             if (recordDate.after(fromDate) && recordDate.before(toDate)) {
                                 filteredList.add(patientHealthRecord);
                             }
                         }
                     }
-                    System.out.println(filteredList);
                 }
             }
             return new ResponseEntity<List<PatientHealthRecord>>(filteredList, HttpStatus.OK);
         }
 
+    @PostMapping("/getPatientHealthRecordByAbhaId/{Id}")
+    public ResponseEntity<List<PatientHealthRecord>> getPatientHealthRecordByAbhaId(@PathVariable("Id") Integer abhaId) {
+        //Fetching the connectionURLs from the DB
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<List<String>> requestEntityURLs = connectionURLInterface.getAllConnectionURL();
+        List<String> listOfConnectionURLs = requestEntityURLs.getBody();
+        List<PatientHealthRecord> listOfPatientHealthRecord = new ArrayList<>();
 
+        //for each connectionURL fetching List of PatientHealthRecord
+        for (int i = 0; i < listOfConnectionURLs.size(); i++) {
+            String connectionURLTemp = listOfConnectionURLs.get(i);
+            String connectionURL = connectionURLTemp + "/patientHealthRecord/getPatientHealthRecordByAbhaId/";
+            Map<String, Object> params = new HashMap<>();
+            params.put("abhaId", abhaId);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(params, headers);
+            ResponseEntity<List<PatientHealthRecord>> responseOfListofPatientHealthRecord = restTemplate.exchange(connectionURL, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<PatientHealthRecord>>() {
+            });
+            List<PatientHealthRecord> records = responseOfListofPatientHealthRecord.getBody();
+            for (int j = 0; j < records.size(); j++) {
+                PatientHealthRecord patientHealthRecord = records.get(j);
+                listOfPatientHealthRecord.add(patientHealthRecord);
+            }
+
+        }
+        return new ResponseEntity<List<PatientHealthRecord>>(listOfPatientHealthRecord, HttpStatus.OK);
+    }
 
     @GetMapping("/getAllPatientHealthRecord")
     public Response getAllPatientHealthRecord() throws ResourceNotFoundException{
@@ -85,8 +108,6 @@ public class PatientHealthRecordController {
         }
         return new Response(responseList, 200);
     }
-
-
 
 
 }
