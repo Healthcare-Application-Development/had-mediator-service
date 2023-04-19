@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class ConsentItem {
 
-    public ConsentItem(Integer id, Integer doctorID, Integer patientID, String consentMessage, Boolean consentAcknowledged, Boolean approved, Date fromDate, Date toDate, ConsentArtifact consentArtifact) {
+    public ConsentItem(Integer id, String doctorID, String patientID, String consentMessage, Boolean consentAcknowledged, Boolean approved, Date fromDate, Date toDate, ConsentArtifact consentArtifact) {
         this.id = id;
         this.doctorID = doctorID;
         this.patientID = patientID;
@@ -18,8 +18,8 @@ public class ConsentItem {
 
     public ConsentItem() {}
     private Integer id;
-    private Integer doctorID;
-    private Integer patientID;
+    private String doctorID;
+    private String patientID;
     private String consentMessage;
     private Boolean consentAcknowledged;
     private Boolean approved;
@@ -65,18 +65,18 @@ public class ConsentItem {
         this.id = id;
     }
 
-    public Integer getDoctorID() {
+    public String getDoctorID() {
         return doctorID;
     }
 
-    public void setDoctorID(Integer doctorID) {
+    public void setDoctorID(String doctorID) {
         this.doctorID = doctorID;
     }
-    public Integer getPatientID() {
+    public String getPatientID() {
         return patientID;
     }
 
-    public void setPatientID(Integer patientID) {
+    public void setPatientID(String patientID) {
         this.patientID = patientID;
     }
     public String getConsentMessage() {

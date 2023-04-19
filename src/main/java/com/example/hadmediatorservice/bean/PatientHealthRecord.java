@@ -2,17 +2,18 @@ package com.example.hadmediatorservice.bean;
 import java.util.Date;
 
 public class PatientHealthRecord {
-    public PatientHealthRecord(Integer abhaId, String recordType, Date timestamp, String hospitalName) {
+    public PatientHealthRecord(String abhaId, String recordType, Date timestamp, String hospitalName) {
         this.abhaId = abhaId;
         this.recordType = recordType;
         this.timestamp=timestamp;
         this.hospitalName=hospitalName;
     }
 
-    private Integer abhaId;
+    private String abhaId;
     String recordType;
     Date timestamp;
     String hospitalName;
+    String description;
     public Date getTimestamp() {
         return timestamp;
     }
@@ -23,11 +24,11 @@ public class PatientHealthRecord {
 
     public PatientHealthRecord(){}
 
-    public Integer getAbhaId() {
+    public String getAbhaId() {
         return abhaId;
     }
 
-    public void setAbhaId(Integer abhaId) {
+    public void setAbhaId(String abhaId) {
         this.abhaId = abhaId;
     }
 
@@ -45,6 +46,11 @@ public class PatientHealthRecord {
     public void setHospitalName(String hospitalName) {
         this.hospitalName = hospitalName;
     }
-
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
 }
