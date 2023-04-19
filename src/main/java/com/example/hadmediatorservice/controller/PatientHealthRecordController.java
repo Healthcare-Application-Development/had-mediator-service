@@ -1,9 +1,14 @@
 package com.example.hadmediatorservice.controller;
 
 import com.example.hadmediatorservice.bean.*;
+import com.example.hadmediatorservice.encryption.AESUtils;
 import com.example.hadmediatorservice.exception.ResourceNotFoundException;
 import com.example.hadmediatorservice.interfaces.ConnectionURLInterface;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +18,14 @@ import java.util.*;
 @RestController
 @RequestMapping("/patientHealthRecord")
 public class PatientHealthRecordController {
+    @Value("${hospital_name}")
+    String username;
 
+    @Value("${hospital_pass}")
+    String password;
+
+    @Autowired
+    AESUtils aesUtils;
     public PatientHealthRecordController() {}
 
 
@@ -22,7 +34,7 @@ public class PatientHealthRecordController {
 
 
     @PostMapping("/getPatientHealthRecord")
-    public ResponseEntity<List<PatientHealthRecord>> getPatientHealthRecord(@RequestBody ConsentArtifact consentArtifact) {
+    public ResponseEntity<List<PatientHealthRecord>> getPatientHealthRecord(@RequestBody ConsentArtifact consentArtifact) throws Exception {
         //Fetching the connectionURLs from the DB
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List<String>> requestEntityURLs= connectionURLInterface.getAllConnectionURL();
@@ -30,19 +42,32 @@ public class PatientHealthRecordController {
         List<PatientHealthRecord> filteredList = new ArrayList<>();
         for (int i = 0; i < listOfConnectionURLs.size(); i++) {
             String connectionURLTemp = listOfConnectionURLs.get(i);
-            String connectionURL=connectionURLTemp+"/patientHealthRecord/getPatientHealthRecord/";
+            Map<String, Object> tokenParams = new HashMap<>();
+            tokenParams.put("username", username);
+            tokenParams.put("password", password);
+            tokenParams.put("role", "ADMIN");
+            HttpHeaders tokenHeaders = new HttpHeaders();
+            tokenHeaders.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Object>> tokenEntity = new HttpEntity<>(tokenParams, tokenHeaders);
+            ResponseEntity<Response> tokenResponseEntity = restTemplate.exchange(connectionURLTemp + "/authenticate", HttpMethod.POST, tokenEntity,  new ParameterizedTypeReference<Response>() {});
+            Response response = tokenResponseEntity.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            String tokenAsString = objectMapper.writeValueAsString(response.getObject());
+            AuthenticationResponse authenticationResponse = objectMapper.readValue(tokenAsString, AuthenticationResponse.class);
+            String token = authenticationResponse.getAccessToken();
+            String connectionURL=connectionURLTemp+"/patientHealthRecord/getPatientHealthRecord";
             List<ConsentItem> listOfConsentItem = consentArtifact.getConsentItems();
-
                 //for each connectionURL fetching List of PatientHealthRecord
                 for (int j = 0; j < listOfConsentItem.size(); j++) {
                     ConsentItem consentItem = listOfConsentItem.get(j);
 
                     //create a map with the correct parameter names and values
                     Map<String, Object> params = new HashMap<>();
-                    params.put("abhaId", consentItem.getPatientID());
-                    params.put("recordType", consentItem.getConsentMessage());
+                    params.put("abhaId", aesUtils.encrypt(consentItem.getPatientID()));
+                    params.put("recordType", aesUtils.encrypt(consentItem.getConsentMessage()));
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);
+                    headers.add("Authorization", "Bearer " + token);
                     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(params, headers);
                     ResponseEntity<List<PatientHealthRecord>> responseEntity = restTemplate.exchange(connectionURL, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<PatientHealthRecord>>() {
                     });
