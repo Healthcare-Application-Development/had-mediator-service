@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ConsentArtifact {
 
-    public ConsentArtifact(Integer artifactId, Integer doctorID, Integer patientID, Date timestamp, boolean emergency, Boolean consentAcknowledged, Boolean approved, Boolean ongoing, List<ConsentItem> consentItems) {
+    public ConsentArtifact(Integer artifactId, String doctorID, String patientID, Date timestamp, boolean emergency, Boolean consentAcknowledged, Boolean approved, Boolean ongoing, List<ConsentItem> consentItems) {
         this.artifactId = artifactId;
         this.doctorID = doctorID;
         this.patientID = patientID;
@@ -20,8 +20,8 @@ public class ConsentArtifact {
 
     public ConsentArtifact() {}
     private Integer artifactId;
-    private Integer doctorID;
-    private Integer patientID;
+    private String doctorID;
+    private String patientID;
     private Date timestamp;
     private boolean emergency;
     private Boolean consentAcknowledged;
@@ -45,19 +45,19 @@ public class ConsentArtifact {
         this.artifactId = artifactId;
     }
 
-    public Integer getDoctorID() {
+    public String getDoctorID() {
         return doctorID;
     }
 
-    public void setDoctorID(Integer doctorID) {
+    public void setDoctorID(String doctorID) {
         this.doctorID = doctorID;
     }
 
-    public Integer getPatientID() {
+    public String getPatientID() {
         return patientID;
     }
 
-    public void setPatientID(Integer patientID) {
+    public void setPatientID(String patientID) {
         this.patientID = patientID;
     }
 

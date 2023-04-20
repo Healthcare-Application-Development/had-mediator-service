@@ -3,6 +3,7 @@ package com.example.hadmediatorservice.controller;
 import com.example.hadmediatorservice.bean.AuthenticationResponse;
 import com.example.hadmediatorservice.bean.Login;
 import com.example.hadmediatorservice.bean.Response;
+import com.example.hadmediatorservice.encryption.AESUtils;
 import com.example.hadmediatorservice.repository.LoginRepository;
 import com.example.hadmediatorservice.security.MyUserDetailsServiceImpl;
 import com.example.hadmediatorservice.security.TokenManager;
@@ -34,11 +35,15 @@ public class AuthController {
     @Autowired
     LoginRepository loginRepository;
 
+    @Autowired
+    AESUtils aesUtils;
+
     @PostMapping("/authenticate")
-    public ResponseEntity<Response> authenticate(@RequestBody Login login) throws JsonProcessingException {
+    public ResponseEntity<Response> authenticate(@RequestBody Login login) throws Exception {
+        String password = aesUtils.decrypt(login.getPassword());
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    login.getUsername(), login.getPassword()));
+                    login.getUsername(), password));
         } catch (final BadCredentialsException ex) {
             System.out.println(ex.getMessage());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
