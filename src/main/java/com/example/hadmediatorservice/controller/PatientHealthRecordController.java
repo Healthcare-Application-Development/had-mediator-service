@@ -77,6 +77,8 @@ public class PatientHealthRecordController {
                     Map<String, Object> params = new HashMap<>();
                     params.put("abhaId", consentItem.getPatientID());
                     params.put("recordType", consentItem.getConsentMessage());
+                    params.put("consentId",consentItem.getId());
+                    params.put("artifactId",consentArtifact.getArtifactId());
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     headers.add("Authorization", "Bearer " + token);
