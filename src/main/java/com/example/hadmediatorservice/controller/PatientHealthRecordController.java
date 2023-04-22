@@ -52,6 +52,8 @@ public class PatientHealthRecordController {
             tokenParams.put("username", username);
             tokenParams.put("password", password);
             tokenParams.put("role", "ADMIN");
+            System.out.println(username);
+            System.out.println(password);
             HttpHeaders tokenHeaders = new HttpHeaders();
             tokenHeaders.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Object>> tokenEntity = new HttpEntity<>(tokenParams, tokenHeaders);
@@ -69,8 +71,11 @@ public class PatientHealthRecordController {
 
                     //create a map with the correct parameter names and values
                     Map<String, Object> params = new HashMap<>();
+                    System.out.println(consentItem.getPatientID());
                     params.put("abhaId", consentItem.getPatientID());
                     params.put("recordType", consentItem.getConsentMessage());
+                    params.put("consentId",consentItem.getId());
+                    params.put("artifactId",consentArtifact.getArtifactId());
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     headers.add("Authorization", "Bearer " + token);
@@ -122,10 +127,12 @@ public class PatientHealthRecordController {
             String token = authenticationResponse.getAccessToken();
             String connectionURL = connectionURLTemp + "/patientHealthRecord/getPatientHealthRecordByAbhaId";
             Map<String, Object> params = new HashMap<>();
+            System.out.println(URLDecoder.decode(id, StandardCharsets.UTF_8));
             params.put("abhaId", URLDecoder.decode(id, StandardCharsets.UTF_8));
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Bearer " + token);
+            System.out.println();
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(params, headers);
             ResponseEntity<List<PatientHealthRecord>> responseOfListofPatientHealthRecord = restTemplate.exchange(connectionURL, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<PatientHealthRecord>>() {
             });
