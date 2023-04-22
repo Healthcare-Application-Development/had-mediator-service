@@ -31,6 +31,12 @@ public class PatientHealthRecordController {
     @Value("${hospital_pass}")
     String password;
 
+    @Value("${CMS_SECRET_KEY}")
+    String cmsSecretString;
+
+    @Value("${HOSPITAL_SECRET_KEY}")
+    String hospitalSecretKey;
+
     @Autowired
     AESUtils aesUtils;
     public PatientHealthRecordController() {}
@@ -63,7 +69,7 @@ public class PatientHealthRecordController {
             String token = authenticationResponse.getAccessToken();
             String connectionURL=connectionURLTemp+"/patientHealthRecord/getPatientHealthRecord";
             List<ConsentItem> listOfConsentItem = consentArtifact.getConsentItems();
-                //for each connectionURL fetching List of PatientHealthRecord
+            //for each connectionURL fetching List of PatientHealthRecord
                 for (int j = 0; j < listOfConsentItem.size(); j++) {
                     ConsentItem consentItem = listOfConsentItem.get(j);
 
@@ -97,7 +103,7 @@ public class PatientHealthRecordController {
         }
 
     @PostMapping("/getPatientHealthRecordByAbhaId")
-    public ResponseEntity<List<PatientHealthRecord>> getPatientHealthRecordByAbhaId(@PathParam("id") String id) throws JsonProcessingException {
+    public ResponseEntity<List<PatientHealthRecord>> getPatientHealthRecordByAbhaId(@PathParam("id") String id) throws Exception {
         //Fetching the connectionURLs from the DB
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List<String>> requestEntityURLs = connectionURLInterface.getAllConnectionURL();
@@ -122,7 +128,8 @@ public class PatientHealthRecordController {
             String token = authenticationResponse.getAccessToken();
             String connectionURL = connectionURLTemp + "/patientHealthRecord/getPatientHealthRecordByAbhaId";
             Map<String, Object> params = new HashMap<>();
-            params.put("abhaId", URLDecoder.decode(id, StandardCharsets.UTF_8));
+            String abhaID = URLDecoder.decode(id, StandardCharsets.UTF_8);
+            params.put("abhaId", aesUtils.encrypt(aesUtils.decrypt(abhaID, cmsSecretString), hospitalSecretKey));
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Bearer " + token);

@@ -9,6 +9,7 @@ import com.example.hadmediatorservice.security.MyUserDetailsServiceImpl;
 import com.example.hadmediatorservice.security.TokenManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,9 +39,16 @@ public class AuthController {
     @Autowired
     AESUtils aesUtils;
 
+    @Value("${CMS_SECRET_KEY}")
+    String cmsSecretString;
+
+    @Value("${HOSPITAL_SECRET_KEY}")
+    String hospitalSecretKey;
+    
+
     @PostMapping("/authenticate")
     public ResponseEntity<Response> authenticate(@RequestBody Login login) throws Exception {
-        String password = aesUtils.decrypt(login.getPassword());
+        String password = aesUtils.decrypt(login.getPassword(), cmsSecretString);
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     login.getUsername(), password));
