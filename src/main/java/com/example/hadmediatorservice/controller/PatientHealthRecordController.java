@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -94,7 +93,21 @@ public class PatientHealthRecordController {
                             Date recordDate = patientHealthRecord.getTimestamp();
                             Date fromDate = consentItem.getFromDate();
                             Date toDate = consentItem.getToDate();
-                            if (recordDate.after(fromDate) && recordDate.before(toDate)) {
+                            Calendar recordDateCal = Calendar.getInstance();
+                            Calendar toDateCal = Calendar.getInstance();
+                            Calendar fromDateCal = Calendar.getInstance();
+                            recordDateCal.setTime(recordDate);
+                            toDateCal.setTime(toDate);
+                            fromDateCal.setTime(fromDate);
+                            
+                            boolean sameDayTo = recordDateCal.get(Calendar.DAY_OF_YEAR) == toDateCal.get(Calendar.DAY_OF_YEAR) &&
+                                                recordDateCal.get(Calendar.YEAR) == toDateCal.get(Calendar.YEAR) && 
+                                                recordDateCal.get(Calendar.MONTH) == toDateCal.get(Calendar.MONTH);
+                            boolean sameDayFrom = recordDateCal.get(Calendar.DAY_OF_YEAR) == fromDateCal.get(Calendar.DAY_OF_YEAR) &&
+                                                  recordDateCal.get(Calendar.YEAR) == fromDateCal.get(Calendar.YEAR) &&
+                                                  recordDateCal.get(Calendar.MONTH) == fromDateCal.get(Calendar.MONTH);
+
+                            if ((recordDate.after(fromDate) || sameDayFrom) && (recordDate.before(toDate) || sameDayTo)) {
                                 filteredList.add(patientHealthRecord);
                             }
                         }
